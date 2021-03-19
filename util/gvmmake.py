@@ -6,6 +6,9 @@ import pickle
 
 class Application:
     def run(self, args):
+        if len(args) == 0:
+            print('Usage: vmMemorySize name shortName author authorEmail version filemaneWithoutExtension')
+            return None
         if args[0] == '-u':
             vmf = open(args[1], 'rb')
             vm = pickle.load(vmf)

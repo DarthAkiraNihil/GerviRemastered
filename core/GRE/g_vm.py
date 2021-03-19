@@ -66,3 +66,10 @@ class VirtualMachine:
     
     def getSelf(self):
         return VirtualMachine(len(self.__mem), self.__meta['name'], self.__meta['shortName'], self.__meta['author'], self.__meta['authorEmail'], self.__meta['version'])
+    
+    def runFile(self, filename):
+        with open(filename, 'r', encoding='utf8') as f:
+            commands = f.readlines()
+            for command in commands:
+                self.execute(command)
+

@@ -1,12 +1,16 @@
 from PyQt5 import QtWidgets
-
+from PyQt5 import QtGui
 from main import Ui_MainWindow
 import sys, pickle, os
 from pathlib import Path
+from loguru import logger
 CWD = Path.cwd() / '..'
 CWD = CWD.absolute().as_posix()
-print(CWD)
+#print(CWD)
 sys.path.append(CWD + '/core/GRE')
+logger.add('dev.log', format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'DEBUG')
+logger.add(sys.stdout, format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'INFO')
+logger.info(CWD, style = 'braces')
 
 
 class MainForm(QtWidgets.QMainWindow):
@@ -40,10 +44,20 @@ class MainForm(QtWidgets.QMainWindow):
         self.fileIsEdited = False
         self.fileName = ''
 
+        self.config = QtWidgets.QAction('Setup GIDE...', self)
+        #self.config.setShortcut('Ct')
+        self.config.triggered.connect(self.__launchConfig)
+        self.ui.menuAbout.addAction(self.config)
+        self.setWindowTitle('GIDE v 0.1')
+        self.setWindowIcon(QtGui.QIcon(CWD + '/util/gide_res/gide.png'))
+
     def __open(self):
-        with open(QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', CWD + '/examples')[0]) as fin:
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', CWD + '/examples')[0]
+        with open(fname, 'r') as fin:
             fileData = fin.read()
             self.ui.textEdit.setText(fileData)
+            self.fname = fname
+            self.wasCalled = True
 
     def __extractConfig(self):
         with open('gide.cfg', 'rb') as iCfg:
@@ -53,6 +67,9 @@ class MainForm(QtWidgets.QMainWindow):
             self.defaultVM = cfg.defaultVM
             self.progPath = cfg.programsPath
     
+    def __launchConfig(self):
+        os.system('python3 gideconfig.py' if os.name != 'nt' else 'python gideconfig.py') #! REMOVE THIS COSTYL
+        self.__extractConfig()
     def __run(self):
         #if not self.wasCalled:
         self.fname, stat = QtWidgets.QInputDialog.getText(self, 'File saving', 'Enter file name:')
@@ -68,17 +85,20 @@ class MainForm(QtWidgets.QMainWindow):
                     vm.runFile(CWD + f'/{self.progPath}/{self.fname}')
                 #os.system(f'python ../gervi.py {self.vmPath}/{self.defaultVM} -f {self.progPath}/{self.fname}')
             else:
-                pass#os.system(f'python ../gervi.py {self.defaultVM} -f {self.progPath}/{self.fname}')
-        #self.wasCallded = True
+                pass
+            #self.wasCalled = True
         #else:
-        #    with open(f'../{self.progPath}/{self.fname}', 'w+', encoding='utf8') as fout:
-        #        fout.write(self.ui.textEdit.toPlainText())
-        #    path = os.getcwd()
-        #    os.chdir('..')
-        #    if self.vmPath != '':
-        #        os.system(f'python gervi.py {self.vmPath}/{self.defaultVM} -f {self.progPath}/{self.fname}')
-        #    else:
-        #        os.system(f'python gervi.py {self.defaultVM} -f {self.progPath}/{self.fname}')
+        #    with open(f'{self.fname}', 'w+', encoding='utf8') as fout:
+        #            fout.write(self.ui.textEdit.toPlainText())
+        #        #path = os.getcwd()
+        #        # os.chdir('..')
+        #            if self.vmPath != '':
+        #                with open(CWD + f'/{self.vmPath}/{self.defaultVM}', 'rb') as vmf:
+        #                    vm = pickle.load(vmf)
+        #                    vm.runFile(f'{self.fname}')
+        #                #os.system(f'python ../gervi.py {self.vmPath}/{self.defaultVM} -f {self.progPath}/{self.fname}')
+        #            else:
+        #                pass
 
 
 

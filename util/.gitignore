@@ -1,2 +1,3 @@
 *.gvm
 __pycache__/
+*.log

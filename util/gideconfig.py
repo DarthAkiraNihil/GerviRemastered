@@ -8,6 +8,7 @@ class MainForm(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.pushButton.clicked.connect(self.__configurate)
+        self.ui.pushButton_2.clicked.connect(QtWidgets.qApp.quit) #QtWidgets.qApp.quit
 
     def __configurate(self):
         with open('gide.cfg', 'wb+') as oCfg:

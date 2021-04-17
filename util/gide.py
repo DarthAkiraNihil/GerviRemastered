@@ -32,8 +32,8 @@ class MainForm(QtWidgets.QMainWindow):
         self.open = QtWidgets.QAction('Open', self)
         self.open.setShortcut('Ctrl+O')
         self.open.triggered.connect(self.__open)
-        self.ui.tableWidget.setColumnCount(2)
-        self.ui.tableWidget.setRowCount(4)
+        #self.ui.tableWidget.setColumnCount(2)
+        #self.ui.tableWidget.setRowCount(4)
         self.ui.menuFile.addAction(self.open)
         self.ui.menuFile.addAction(self.exit)
         self.run = QtWidgets.QAction('Run', self)
@@ -83,6 +83,8 @@ class MainForm(QtWidgets.QMainWindow):
                 with open(CWD + f'/{self.vmPath}/{self.defaultVM}', 'rb') as vmf:
                     vm = pickle.load(vmf)
                     vm.runFile(CWD + f'/{self.progPath}/{self.fname}')
+                    self.ui.textBrowser_2.setText(vm.getOutputStream())
+                    self.ui.textBrowser.setText(vm.getState())
                 #os.system(f'python ../gervi.py {self.vmPath}/{self.defaultVM} -f {self.progPath}/{self.fname}')
             else:
                 pass

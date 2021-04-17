@@ -20,6 +20,7 @@ class VirtualMachine:
             'authorEmail' : authorEmail,
             'version' : version,
         }
+        self.__outputStream = ''
         
     def execute(self, command):
         p_com = self.__parser.parse(command)
@@ -31,7 +32,9 @@ class VirtualMachine:
             elif p_com['com'] == 'rd':
                 return self.__mem.read(int(p_com['arg1']))
             elif p_com['com'] == 'out':
-                print(self.__mem.read(int(p_com['arg1'])))
+                out = self.__mem.read(int(p_com['arg1']))
+                print(out)
+                self.__outputStream += f'{out}\n'
         elif p_com['com'] in self.__commandFamilies['logic']:
             if p_com['com'] == 'and':
                 self.__mem.logicAnd(int(p_com['arg1']), int(p_com['arg2']))
@@ -72,4 +75,17 @@ class VirtualMachine:
             commands = f.readlines()
             for command in commands:
                 self.execute(command)
+
+    def getState(self):
+        state = 'Cell No = Cell value\n'
+        for i in range(self.__size):
+            cellVal = self.__mem.read(i)
+            if cellVal == [0,0,0,0,0,0,0,0]:
+                break
+            else:
+                state += f'{i} = {cellVal}\n'
+        return state
+    
+    def getOutputStream(self):
+        return self.__outputStream
 

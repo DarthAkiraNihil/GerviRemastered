@@ -3,14 +3,14 @@ from PyQt5 import QtGui
 from main import Ui_MainWindow
 import sys, pickle, os
 from pathlib import Path
-from loguru import logger
+#from loguru import logger
 CWD = Path.cwd() / '..'
 CWD = CWD.absolute().as_posix()
 #print(CWD)
 sys.path.append(CWD + '/core/GRE')
-logger.add('dev.log', format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'DEBUG')
-logger.add(sys.stdout, format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'INFO')
-logger.info(CWD, style = 'braces')
+#logger.add('dev.log', format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'DEBUG')
+#logger.add(sys.stdout, format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'INFO')
+#logger.info(CWD, style = 'braces')
 
 
 class MainForm(QtWidgets.QMainWindow):

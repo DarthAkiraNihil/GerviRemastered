@@ -26,7 +26,8 @@ class PrimaryMemory:
         self.__pm = [MemoryCell() for _i in range(length)]
     
     def logicNot(self, addr):
-        self.__cell.logicNot()
+        #self.__cell.logicNot()
+        self.__pm[addr].logicNot()
 
     def logicAnd(self, addr, argAddr):
         self.__pm[addr].logicAnd(self.__pm[argAddr])
@@ -49,11 +50,11 @@ class PrimaryMemory:
     
     def logicNand(self, addr, argAddr):
         self.logicAnd(addr, argAddr)
-        self.logicNot()
+        self.logicNot(addr)
     
     def logicNor(self, addr, argAddr):
         self.logicOr(addr, argAddr)
-        self.logicNot()
+        self.logicNot(addr)
     
     def move(self, source, destination):
         self.__pm[destination].write(self.__pm[source])

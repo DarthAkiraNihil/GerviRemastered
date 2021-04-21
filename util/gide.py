@@ -3,6 +3,8 @@ from PyQt5 import QtGui
 from main import Ui_MainWindow
 import sys, pickle, os
 from pathlib import Path
+from setup import Ui_Dialog
+from gidecfg_class import GIDEConfig
 #from loguru import logger
 CWD = Path.cwd() / '..'
 CWD = CWD.absolute().as_posix()
@@ -11,7 +13,18 @@ sys.path.append(CWD + '/core/GRE')
 #logger.add('dev.log', format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'DEBUG')
 #logger.add(sys.stdout, format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'INFO')
 #logger.info(CWD, style = 'braces')
-
+class ConfigDialog(QtWidgets.QDialog, Ui_Dialog):
+    def __init__(self):
+        super(ConfigDialog, self).__init__()
+        self.setupUi(self)
+        self.setWindowTitle('GIDE configuration')
+        self.setWindowIcon(QtGui.QIcon(CWD + '/util/gide_res/gideconfig.png'))
+    
+    def setupGide(self):
+        if self.exec_() == QtWidgets.QDialog.Accepted:
+            return self.lineEdit.text(), self.lineEdit_2.text(), self.lineEdit_3.text()
+        else:
+            return None
 
 class MainForm(QtWidgets.QMainWindow):
     def __init__(self):
@@ -68,7 +81,15 @@ class MainForm(QtWidgets.QMainWindow):
             self.progPath = cfg.programsPath
     
     def __launchConfig(self):
-        os.system('python3 gideconfig.py' if os.name != 'nt' else 'python gideconfig.py') #! REMOVE THIS COSTYL
+        
+        #os.system('python3 gideconfig.py' if os.name != 'nt' else 'python gideconfig.py') #! REMOVE THIS COSTYL
+        setupWin = ConfigDialog()
+        res = setupWin.setupGide()
+        if res:
+            v1, v2, v3 = res
+            with open('gide.cfg', 'wb+') as oCfg:
+                cfg = GIDEConfig(v1, v2, v3)
+                pickle.dump(cfg, oCfg)
         self.__extractConfig()
     def __run(self):
         #if not self.wasCalled:

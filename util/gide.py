@@ -1,7 +1,7 @@
-from PyQt5 import QtWidgets
-from PyQt5 import QtGui
+from PyQt5 import QtWidgets, QtGui
+
 from main import Ui_MainWindow
-import sys, pickle, os
+import sys, pickle, os, traceback
 from pathlib import Path
 from setup import Ui_Dialog
 from gidecfg_class import GIDEConfig
@@ -32,6 +32,9 @@ class MainForm(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+
+        self.__ver = '0.5'
+
         self.exit = QtWidgets.QAction('Exit', self)
         self.exit.setShortcut('Ctrl+Q')
         self.exit.triggered.connect(QtWidgets.qApp.quit)
@@ -57,13 +60,24 @@ class MainForm(QtWidgets.QMainWindow):
         self.fileIsEdited = False
         self.fileName = ''
 
+        self.about = QtWidgets.QAction('About Gide', self)
+        self.about.triggered.connect(self.__about)
+        self.ui.menuHelp.addAction(self.about)
         self.config = QtWidgets.QAction('Setup GIDE...', self)
         #self.config.setShortcut('Ct')
         self.config.triggered.connect(self.__launchConfig)
         self.ui.menuAbout.addAction(self.config)
-        self.setWindowTitle('GIDE v 0.1')
+        self.setWindowTitle(f'GIDE version {self.__ver}')
         self.setWindowIcon(QtGui.QIcon(CWD + '/util/gide_res/gide.png'))
 
+        
+
+    def __bonk(self, msg):
+        QtWidgets.QMessageBox.critical(self, 'Error!', msg)
+
+
+    def __about(self):
+        QtWidgets.QMessageBox.information(self, 'About GIDE', f'GIDE version {self.__ver}.\nA IDE for writing Gervi scripts\nBy TheSwagVader. github.com/TheSwagVader')
     def __open(self):
         fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', CWD + '/examples')[0]
         with open(fname, 'r') as fin:
@@ -81,8 +95,6 @@ class MainForm(QtWidgets.QMainWindow):
             self.progPath = cfg.programsPath
     
     def __launchConfig(self):
-        
-        #os.system('python3 gideconfig.py' if os.name != 'nt' else 'python gideconfig.py') #! REMOVE THIS COSTYL
         setupWin = ConfigDialog()
         res = setupWin.setupGide()
         if res:
@@ -91,39 +103,31 @@ class MainForm(QtWidgets.QMainWindow):
                 cfg = GIDEConfig(v1, v2, v3)
                 pickle.dump(cfg, oCfg)
         self.__extractConfig()
+
     def __run(self):
-        #if not self.wasCalled:
         self.fname, stat = QtWidgets.QInputDialog.getText(self, 'File saving', 'Enter file name:')
         if stat:
-            #print(self.ui.textEdit.toPlainText())
-            with open(CWD + f'/{self.progPath}/{self.fname}', 'w+', encoding='utf8') as fout:
-                fout.write(self.ui.textEdit.toPlainText())
-            #path = os.getcwd()
-            # os.chdir('..')
-            if self.vmPath != '':
-                with open(CWD + f'/{self.vmPath}/{self.defaultVM}', 'rb') as vmf:
-                    vm = pickle.load(vmf)
-                    vm.runFile(CWD + f'/{self.progPath}/{self.fname}')
-                    self.ui.textBrowser_2.setText(vm.getOutputStream())
-                    self.ui.textBrowser.setText(vm.getState())
-                #os.system(f'python ../gervi.py {self.vmPath}/{self.defaultVM} -f {self.progPath}/{self.fname}')
+            if self.fname == 'i_want_to_be_boss_of_this_gym' and self.ui.textEdit.toPlainText() == 'JABRONI':
+                QtWidgets.QMessageBox.information(self,'You picked wrong door!', ' Leatherclub two blocks down!')
             else:
-                pass
-            #self.wasCalled = True
-        #else:
-        #    with open(f'{self.fname}', 'w+', encoding='utf8') as fout:
-        #            fout.write(self.ui.textEdit.toPlainText())
-        #        #path = os.getcwd()
-        #        # os.chdir('..')
-        #            if self.vmPath != '':
-        #                with open(CWD + f'/{self.vmPath}/{self.defaultVM}', 'rb') as vmf:
-        #                    vm = pickle.load(vmf)
-        #                    vm.runFile(f'{self.fname}')
-        #                #os.system(f'python ../gervi.py {self.vmPath}/{self.defaultVM} -f {self.progPath}/{self.fname}')
-        #            else:
-        #                pass
-
-
+                try:
+                    with open(CWD + f'/{self.progPath}/{self.fname}', 'w+', encoding='utf8') as fout:
+                        fout.write(self.ui.textEdit.toPlainText())
+                except Exception as e:
+                    self.__bonk(traceback.format_exc())
+                    return
+                if self.vmPath != '':
+                    try:
+                        with open(CWD + f'/{self.vmPath}/{self.defaultVM}', 'rb') as vmf:
+                            vm = pickle.load(vmf)
+                            vm.runFile(CWD + f'/{self.progPath}/{self.fname}')
+                            self.ui.textBrowser_2.setText(vm.getOutputStream())
+                            self.ui.textBrowser.setText(vm.getState())
+                    except Exception as e:
+                        self.__bonk(traceback.format_exc())
+                        return
+                else:
+                    pass
 
 app = QtWidgets.QApplication([])
 application = MainForm()

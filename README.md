@@ -6,6 +6,7 @@ In this version was removed next elements, which was in the old version:
 * Operations with only one bit in BinaryData objects
 * Virtual machine as text file
 * Different memories: working and RAM
+
 In this version was improved:
 * Math operations
 * Virtual machine as binary file

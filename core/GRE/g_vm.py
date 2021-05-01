@@ -115,7 +115,8 @@ class VirtualMachine:
             #    self.execute(command)
 
     def getState(self):
-        state = 'Cell Number |      Bin | Dec | Hex\n'
+        meta = self.getMetaInfoString()
+        state = meta + '\nCell Number |      Bin | Dec | Hex\n'
         for i in range(self.__size):
             cellVal = self.__mem.read(i)
             if cellVal == [0,0,0,0,0,0,0,0]:
@@ -130,4 +131,7 @@ class VirtualMachine:
     
     def getOutputStream(self):
         return self.__outputStream
+    
+    def getMetaInfoString(self):
+        return 'Using %s %s by %s (memsize %d)' % (self.__meta['name'], self.__meta['version'], self.__meta['author'], self.__size)
 

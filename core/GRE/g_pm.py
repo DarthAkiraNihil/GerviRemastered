@@ -1,5 +1,6 @@
 from g_mc import MemoryCell
 from g_bo import BinaryObject
+import copy
 class PrimaryMemory:
     def __init__(self, length):
         self.__pm = [MemoryCell() for _i in range(length)]
@@ -55,13 +56,22 @@ class PrimaryMemory:
     def logicNor(self, addr, argAddr):
         self.logicOr(addr, argAddr)
         self.logicNot(addr)
+
+    def sub(self, addr, argAddr):
+        self.__pm[addr].sub(self.__pm[argAddr])
+
+    def add(self, addr, argAddr):
+        self.__pm[addr].add(self.__pm[argAddr])
     
     def move(self, source, destination):
-        self.__pm[destination].write(self.__pm[source])
+        self.__pm[destination] = copy.deepcopy(self.__pm[source])
+        #dest = MemoryCell()
+        #dest.write(self.__pm[source].read())
+        #self.__pm[destination] = dest
         self.__pm[source].clear()
     
     def copy(self, source, destination):
-        self.__pm[destination].write(self.__pm[source])
+        self.__pm[destination] = copy.deepcopy(self.__pm[source])
     
     def __len__(self):
         return len(self.__pm)

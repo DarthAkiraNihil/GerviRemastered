@@ -79,3 +79,15 @@ class BinaryObject:
                 self.__obj[i-1] += 1
         if self.__obj[0] > 1:
             self.__obj[0] -= 2
+    
+    def advancedCode(self):
+        self.logicNot()
+        temp = BinaryObject(self.__size)
+        one = [0 for _i in range(self.__size-1)]
+        one.append(1)
+        temp.write(one)
+        self.add(temp)
+
+    def sub(self, arg):
+        arg.advancedCode()
+        self.add(arg)

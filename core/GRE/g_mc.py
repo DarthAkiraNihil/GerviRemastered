@@ -63,6 +63,12 @@ class MemoryCell:
     def logicNor(self, arg):
         self.logicOr(arg)
         self.logicNot()
+    
+    def add(self, arg):
+        self.__cell.add(arg.readAsBinaryObject())
+    
+    def sub(self, arg):
+        self.__cell.sub(arg.readAsBinaryObject())
 
 
 

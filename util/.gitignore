@@ -1,3 +1,6 @@
 *.gvm
 __pycache__/
 *.log
+setup_old.ui
+temp.py
+*.gvmp

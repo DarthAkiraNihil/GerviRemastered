@@ -7,19 +7,25 @@ import pickle
 class Application:
     def run(self, args):
         if len(args) == 0:
-            print('Usage: vmMemorySize name shortName author authorEmail version filemaneWithoutExtension')
+            print('Usage: prototypeFileName')
             return None
-        if args[0] == '-u':
-            vmf = open(args[1], 'rb')
-            vm = pickle.load(vmf)
-            vmf.close()
-            vm = vm.getSelf()
-            with open(args[1], 'wb') as f:
-                pickle.dump(vm, f)
         else:
-            vm = VirtualMachine(int(args[0]), args[1], args[2], args[3], args[4], args[5])
-            with open(f'{args[6]}.gvm', 'wb+') as f:
+            vmData = self.__extractData(args[0])
+            vm = VirtualMachine(int(vmData['MemSize']), vmData['Name'], vmData['Short'], vmData['Author'], vmData['Email'], vmData['Ver'])
+            with open('%s.gvm' % (vmData['Out']), 'wb+') as f:
                 pickle.dump(vm, f)
+    def __extractData(self, file):
+        with open(file, 'r', encoding='utf8') as fin:
+            lines = fin.readlines()
+            for i in range(len(lines)):
+                lines[i] = lines[i].split(':')
+                lines[i][1] = lines[i][1][:-1]
+            data = {}
+            print(lines)
+            for line in lines:
+                data[line[0]] = line[1]
+            return data
+
 
 app = Application()
 app.run(sys.argv[1:])

@@ -1,0 +1,17 @@
+body {
+    font-style: normal;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt; 
+}
+.syntaxFrame {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New';
+}
+
+table.methodDesc, table.methodDesc td{
+    border: 2px solid black;
+    width: 100%;
+    padding: 10px;
+}
+table.methodDesc td {
+    background-color: lightcyan;
+}

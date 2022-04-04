@@ -100,7 +100,7 @@ class VirtualMachine:
             if command == 'shtd':
                 break
             else:
-                self.execute(command, self.__ip)
+                self.execute(command)
     
     def getSelf(self):
         return VirtualMachine(len(self.__mem), self.__meta['name'], self.__meta['shortName'], self.__meta['author'], self.__meta['authorEmail'], self.__meta['version'])

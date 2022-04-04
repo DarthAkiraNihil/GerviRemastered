@@ -13,16 +13,39 @@ sys.path.append(CWD + '/core/GRE')
 #logger.add('dev.log', format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'DEBUG')
 #logger.add(sys.stdout, format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'INFO')
 #logger.info(CWD, style = 'braces')
+
+ 
 class ConfigDialog(QtWidgets.QDialog, Ui_Dialog):
     def __init__(self):
         super(ConfigDialog, self).__init__()
         self.setupUi(self)
         self.setWindowTitle('GIDE configuration')
         self.setWindowIcon(QtGui.QIcon(CWD + '/util/gide_res/gideconfig.png'))
+        self.pushButton.clicked.connect(self.__browse)
+        self.pushButton_2.clicked.connect(self.__chooseDir)
+        self.configFile = GIDEConfig('config.ini')
+        self.configuration = self.configFile.extract()
+        self.lineEdit.setText(self.configuration['INTERPRETER']['vmpath'])
+        self.lineEdit_2.setText(self.configuration['INTERPRETER']['progsdir'])
+        self.hasItChanged = {
+            'vmpath' : False,
+            'progsDir' : False
+        }
     
+    def __browse(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Select default VM', CWD)[0]
+        self.hasItChanged['vmpath'] = True
+        self.lineEdit.setText(fname[2:])
+    
+    def __chooseDir(self):
+        dirName =str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select programs directory'))
+        self.hasItChanged['progsDir'] = True
+        self.lineEdit_2.setText(dirName[2:])
+
     def setupGide(self):
         if self.exec_() == QtWidgets.QDialog.Accepted:
-            return self.lineEdit.text(), self.lineEdit_2.text(), self.lineEdit_3.text()
+            #vmPath, progsDir = self.lineEdit.text() if self.hasItChanged['vmpath'] else 'PREVIOUS', self.lineEdit_2.text() if self.hasItChanged['progsDir'] else 'PREVIOUS'
+            return ['INTERPRETER', 'INTERPRETER'], ['VMPath', 'ProgsDir'], [self.lineEdit.text(), self.lineEdit_2.text()]
         else:
             return None
 
@@ -39,17 +62,14 @@ class MainForm(QtWidgets.QMainWindow):
         self.exit.setShortcut('Ctrl+Q')
         self.exit.triggered.connect(QtWidgets.qApp.quit)
 
-        self.vmPath = ''
-        self.defaultVM = ''
-        self.progPath = ''
+        self.configFile = GIDEConfig('config.ini')
+        self.configuration = {}
         self.wasCalled = False
         self.fname = ''
 
         self.open = QtWidgets.QAction('Open', self)
         self.open.setShortcut('Ctrl+O')
         self.open.triggered.connect(self.__open)
-        #self.ui.tableWidget.setColumnCount(2)
-        #self.ui.tableWidget.setRowCount(4)
         self.ui.menuFile.addAction(self.open)
         self.ui.menuFile.addAction(self.exit)
         self.run = QtWidgets.QAction('Run', self)
@@ -59,12 +79,11 @@ class MainForm(QtWidgets.QMainWindow):
         self.__extractConfig()
         self.fileIsEdited = False
         self.fileName = ''
-
+        print(self.configuration)
         self.about = QtWidgets.QAction('About Gide', self)
         self.about.triggered.connect(self.__about)
         self.ui.menuHelp.addAction(self.about)
         self.config = QtWidgets.QAction('Setup GIDE...', self)
-        #self.config.setShortcut('Ct')
         self.config.triggered.connect(self.__launchConfig)
         self.ui.menuAbout.addAction(self.config)
         self.setWindowTitle(f'GIDE version {self.__ver}')
@@ -77,50 +96,47 @@ class MainForm(QtWidgets.QMainWindow):
 
 
     def __about(self):
-        QtWidgets.QMessageBox.information(self, 'About GIDE', f'GIDE version {self.__ver}.\nA IDE for writing Gervi scripts\nBy TheSwagVader. github.com/TheSwagVader')
+        QtWidgets.QMessageBox.information(self, 'About GIDE', f'GIDE version {self.__ver}.\nGIDE - It just works!\nA IDE for writing Gervi scripts\nBy TheSwagVader. github.com/TheSwagVader')
+
     def __open(self):
-        fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', CWD + '/examples')[0]
-        with open(fname, 'r') as fin:
-            fileData = fin.read()
-            self.ui.textEdit.setText(fileData)
-            self.fname = fname
-            self.wasCalled = True
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', self.configuration['INTERPRETER']['progsdir'])[0]
+        if fname != '':
+            with open(fname, 'r') as fin:
+                fileData = fin.read()
+                self.ui.textEdit.setText(fileData)
+                self.fname = fname
+                self.wasCalled = True
 
     def __extractConfig(self):
-        with open('gide.cfg', 'rb') as iCfg:
-            cfg = pickle.load(iCfg)
-
-            self.vmPath = cfg.vmPath
-            self.defaultVM = cfg.defaultVM
-            self.progPath = cfg.programsPath
+        self.configuration = self.configFile.extract()
     
     def __launchConfig(self):
         setupWin = ConfigDialog()
         res = setupWin.setupGide()
         if res:
-            v1, v2, v3 = res
-            with open('gide.cfg', 'wb+') as oCfg:
-                cfg = GIDEConfig(v1, v2, v3)
-                pickle.dump(cfg, oCfg)
-        self.__extractConfig()
+            sections, parameters, values = res
+            self.configFile.setOptions(sections, parameters, values)
+            self.configFile.update()
+            self.__extractConfig()
 
     def __run(self):
-        self.fname, stat = QtWidgets.QInputDialog.getText(self, 'File saving', 'Enter file name:')
-        if stat:
+        self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Save file', self.configuration['INTERPRETER']['progsdir'])[0]
+        if self.fname != '':
             if self.fname == 'i_want_to_be_boss_of_this_gym' and self.ui.textEdit.toPlainText() == 'JABRONI':
                 QtWidgets.QMessageBox.information(self,'You picked wrong door!', ' Leatherclub two blocks down!')
             else:
+                #prog = os.path.expanduser('%s/%s' % (self.configuration['INTERPRETER']['progsdir'], self.fname))
                 try:
-                    with open(CWD + f'/{self.progPath}/{self.fname}', 'w+', encoding='utf8') as fout:
+                    with open(self.fname, 'w+', encoding='utf8') as fout:
                         fout.write(self.ui.textEdit.toPlainText())
                 except Exception as e:
                     self.__bonk(traceback.format_exc())
                     return
-                if self.vmPath != '':
+                if self.configuration['INTERPRETER']['vmpath'] != '':
                     try:
-                        with open(CWD + f'/{self.vmPath}/{self.defaultVM}', 'rb') as vmf:
+                        with open(self.configuration['INTERPRETER']['vmpath'], 'rb') as vmf:
                             vm = pickle.load(vmf)
-                            vm.runFile(CWD + f'/{self.progPath}/{self.fname}')
+                            vm.runFile(self.fname)
                             self.ui.textBrowser_2.setText(vm.getOutputStream())
                             self.ui.textBrowser.setText(vm.getState())
                     except Exception as e:

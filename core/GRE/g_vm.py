@@ -1,6 +1,7 @@
 from g_pm import PrimaryMemory
 from g_bo import BinaryObject
 from g_pa import Parser
+from g_es import ExceptionSystem
 #from g_rm import RegisterMemory
 
 class VirtualMachine:
@@ -11,6 +12,7 @@ class VirtualMachine:
         self.__commandFamilies = {
             'io' : {'wrt', 'rd', 'out'},
             'logic' : {'and', 'not', 'or', 'xor', 'imp', 'eqv', 'nand', 'nor'},
+            'shifts' : {'lsl', 'lsr', 'asl', 'asr', 'csl', 'csr'},
             'math' : {'add', 'sub'},
             'data' : {'mov', 'copy'},
             'jumps' : {'jmp'},
@@ -26,6 +28,9 @@ class VirtualMachine:
         self.__outputStream = ''
         self.__ip = 0
         self.__aliases = {}
+
+        self.__exceptionSystem = ExceptionSystem()
+        
         
     def execute(self, command):
         if command.isspace():
@@ -90,6 +95,20 @@ class VirtualMachine:
             elif p_com['com'] in self.__commandFamilies['vars']:
                 if p_com['com'] == 'als':
                     self.__aliases[p_com['arg1']] = p_com['arg2']
+            elif p_com['com'] in self.__commandFamilies['shifts']:
+                if p_com['com'] == 'lsl':
+                    self.__mem.logicShiftLeft(int(p_com['arg1']), int(p_com['arg2']))
+                elif p_com['com'] == 'lsr':
+                    self.__mem.logicShiftRight(int(p_com['arg1']), int(p_com['arg2']))
+                elif p_com['com'] == 'asl':
+                    self.__mem.ariphmeticShiftLeft(int(p_com['arg1']), int(p_com['arg2']))
+                elif p_com['com'] == 'asr':
+                    self.__mem.ariphmeticShiftRight(int(p_com['arg1']), int(p_com['arg2']))
+                elif p_com['com'] == 'csl':
+                    self.__mem.cyclicShiftLeft(int(p_com['arg1']), int(p_com['arg2']))
+                elif p_com['com'] == 'csr':
+                    self.__mem.cyclicShiftRight(int(p_com['arg1']), int(p_com['arg2']))
+                
             self.__ip += 1
         
         

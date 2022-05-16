@@ -120,7 +120,7 @@ class MainForm(QtWidgets.QMainWindow):
             self.__extractConfig()
 
     def __run(self):
-        self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Save file', self.configuration['INTERPRETER']['progsdir'])[0]
+        self.fname = QtWidgets.QFileDialog.getSaveFileName(self, 'Save file', self.configuration['INTERPRETER']['progsdir'])[0]
         if self.fname != '':
             if self.fname == 'i_want_to_be_boss_of_this_gym' and self.ui.textEdit.toPlainText() == 'JABRONI':
                 QtWidgets.QMessageBox.information(self,'You picked wrong door!', ' Leatherclub two blocks down!')

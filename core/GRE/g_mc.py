@@ -116,17 +116,38 @@ class MemoryCell:
         Out: void
         Desc: Releases NAND (AND + NOT) for current MemoryCell and the other
         '''
-        self.logicAnd(arg)
-        self.logicNot()
+        #self.logicAnd(arg)
+        #self.logicNot()
+        self.__cell.logicNand(arg.readAsBinaryObject())
     
     def logicNor(self, arg):
         '''In: MemoryCell
         Out: void
         Desc: Releases NOR (OR + NOT) for current MemoryCell and the other
         '''
-        self.logicOr(arg)
-        self.logicNot()
+        #self.logicOr(arg)
+        #self.logicNot()
+        self.__cell.logicNor(arg.readAsBinaryObject())
     
+
+    def logicShiftLeft(self, pos):
+        self.__cell.logicShiftLeft(pos)
+
+    def logicShiftRight(self, pos):
+        self.__cell.logicShiftRight(pos)
+
+    def ariphmeticShiftLeft(self, pos):
+        self.__cell.ariphmeticShiftLeft(pos)
+
+    def ariphmeticShiftRight(self, pos):
+        self.__cell.ariphmeticShiftRight(pos)
+
+    def cyclicShiftLeft(self, pos):
+        self.__cell.cyclicShiftLeft(pos)
+
+    def cyclicShiftRight(self, pos):
+        self.__cell.cyclicShiftRight(pos)
+
     def add(self, arg):
         '''In: MemoryCell
         Out: void
@@ -139,6 +160,7 @@ class MemoryCell:
         Out: void
         Desc: substacts value of the argument from the internal data
         '''
+        self.__cell.sub(arg.readAsBinaryObject())
 
 
 

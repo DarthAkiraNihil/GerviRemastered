@@ -151,6 +151,71 @@ class BinaryObject:
         self.logicOr(arg)
         self.logicNot()
 
+    #shifts
+
+    def __lsl_1(self):
+        temp = self.__obj[1:]
+        temp.append(0)
+        self.__obj = temp
+    
+    def __lsr_1(self):
+        temp = [0]
+        for elem in self.__obj[:-1]:
+            temp.append(elem)
+        self.__obj = temp
+
+    def logicShiftLeft(self, pos):
+        for i in range(pos):
+            self.__lsl_1()
+
+    def logicShiftRight(self, pos):
+        for i in range(pos):
+            self.__lsr_1()
+    
+    def __asl_1(self):
+        #sign = self.__obj[0]
+        self.__lsl_1()
+        #self.__obj[0] = sign
+    
+    def __asr_1(self):
+        sign = self.__obj[0]
+        self.__lsr_1()
+        self.__obj[0] = sign
+
+    def ariphmeticShiftLeft(self, pos):
+        for i in range(pos):
+            self.__asl_1()
+
+    def ariphmeticShiftRight(self, pos):
+        for i in range(pos):
+            self.__asr_1()
+    
+    def __csl_1(self):
+        first = self.__obj[0]
+        self.__lsl_1()
+        self.__obj[-1] = first
+    
+    def __csr_1(self):
+        last = self.__obj[-1]
+        self.__lsr_1()
+        self.__obj[0] = last
+
+    def cyclicShiftLeft(self, pos):
+        for i in range(pos):
+            self.__csl_1()
+
+    def cyclicShiftRight(self, pos):
+        for i in range(pos):
+            self.__csr_1()
+    #def ariphmeticShiftLeft(self, pos):
+    #    sign = self.__obj[0]
+        
+    
+    #def ariphmeticShiftRight(self, pos):
+    #    pass
+
+    
+
     
     def add(self,arg):
         """In: other BinaryObject
@@ -194,4 +259,4 @@ class BinaryObject:
         """
         arg.advancedCode()
         self.add(arg)
-        arg.advancedCode()
+        #arg.advancedCode()

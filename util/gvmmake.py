@@ -19,7 +19,8 @@ class Application:
             lines = fin.readlines()
             for i in range(len(lines)):
                 lines[i] = lines[i].split(':')
-                lines[i][1] = lines[i][1][:-1]
+                if lines[i][1].endswith('\n'):
+                    lines[i][1] = lines[i][1][:-1]
             data = {}
             print(lines)
             for line in lines:

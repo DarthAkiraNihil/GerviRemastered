@@ -50,12 +50,32 @@ class PrimaryMemory:
 
     
     def logicNand(self, addr, argAddr):
-        self.logicAnd(addr, argAddr)
-        self.logicNot(addr)
+        #self.logicAnd(addr, argAddr)
+        #self.logicNot(addr)
+        self.__pm[addr].logicNand(self.__pm[argAddr])
     
     def logicNor(self, addr, argAddr):
-        self.logicOr(addr, argAddr)
-        self.logicNot(addr)
+        #self.logicOr(addr, argAddr)
+        #self.logicNot(addr)
+        self.__pm[addr].logicNor(self.__pm[argAddr])
+
+    def logicShiftLeft(self, addr, pos):
+        self.__pm[addr].logicShiftLeft(pos)
+
+    def logicShiftRight(self, addr, pos):
+        self.__pm[addr].logicShiftRight(pos)
+
+    def ariphmeticShiftLeft(self, addr, pos):
+        self.__pm[addr].ariphmeticShiftLeft(pos)
+
+    def ariphmeticShiftRight(self, addr, pos):
+        self.__pm[addr].ariphmeticShiftRight(pos)
+
+    def cyclicShiftLeft(self, addr, pos):
+        self.__pm[addr].cyclicShiftLeft(pos)
+
+    def cyclicShiftRight(self, addr, pos):
+        self.__pm[addr].cyclicShiftRight(pos)
 
     def sub(self, addr, argAddr):
         self.__pm[addr].sub(self.__pm[argAddr])

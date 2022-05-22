@@ -4,3 +4,8 @@ __pycache__/
 setup_old.ui
 temp.py
 *.gvmp
+in
+*.exe
+*.spec
+launchgide.py
+*.bat

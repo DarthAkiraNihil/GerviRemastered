@@ -1,15 +1,21 @@
 from PyQt5 import QtWidgets, QtGui
-
-from main import Ui_MainWindow
-import sys, pickle, os, traceback
 from pathlib import Path
+import sys, pickle, os, traceback
+CWDR = Path.cwd()
+CWD = Path.cwd() / '..'
+CWD = CWD.absolute().as_posix()
+CWDR = CWDR.absolute().as_posix()
+#print(CWD)
+sys.path.append(CWDR)
+sys.path.append(CWD + '/core/GRE')
+print(sys.path)
+from main import Ui_MainWindow
+
+
 from setup import Ui_Dialog
 from gidecfg_class import GIDEConfig
 #from loguru import logger
-CWD = Path.cwd() / '..'
-CWD = CWD.absolute().as_posix()
-#print(CWD)
-sys.path.append(CWD + '/core/GRE')
+
 #logger.add('dev.log', format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'DEBUG')
 #logger.add(sys.stdout, format='[{time:HH:mm:ss}] <lvl>{message}</lvl>', level = 'INFO')
 #logger.info(CWD, style = 'braces')
@@ -144,7 +150,7 @@ class MainForm(QtWidgets.QMainWindow):
                         return
                 else:
                     pass
-
+print(sys.path)
 app = QtWidgets.QApplication([])
 application = MainForm()
 application.show()

@@ -14,6 +14,7 @@ class Application:
             vm = VirtualMachine(int(vmData['MemSize']), vmData['Name'], vmData['Short'], vmData['Author'], vmData['Email'], vmData['Ver'])
             with open('%s.gvm' % (vmData['Out']), 'wb+') as f:
                 pickle.dump(vm, f)
+                
     def __extractData(self, file):
         with open(file, 'r', encoding='utf8') as fin:
             lines = fin.readlines()

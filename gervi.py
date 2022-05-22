@@ -1,5 +1,5 @@
 import sys, pickle
-sys.path.append('core/GRE')
+sys.path.append('./core/GRE')
 from g_vm import VirtualMachine
 if len(sys.argv) == 1:
     print('Usage: vmFile mode [filename]\nmode can be:\n-t - terminal mode, not require filename\n-f - file run mode, require filename')

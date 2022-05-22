@@ -1,3 +1,8 @@
 __pycache__/
+Python391/
+*.bat
+*.nsi
+installprog.nsi
 *.gasm
 *.gvm
+*.exe

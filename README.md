@@ -1,22 +1,22 @@
 # Gervi Remastered (True Gervi)
-So, this is remastered version of Gervi project. More structured, error-free and functional.
+So, this is the remastered version of Gervi project. It's more structured, error-free, functional and optimized.
 ## List of changes 
-In this version was removed next elements, which was in the old version:
+In this version were removed the following elements, which were in the old version:
 * Reading and writing different types of values (bool, int, word etc.)
 * Operations with only one bit in BinaryData objects
-* Virtual machine as text file
-* Different memories: working and RAM
+* A virtual machine as a text file
+* Different types of memory: working and RAM
 
-In this version was improved:
+In this version were improved:
 * Math operations
-* Virtual machine as binary file
-* Lesser logic operations
-* BinaryObjects use int values in list, not str
+* A virtual machine as a binary file with LZMA compression
+* Less logic operations
+* PrimaryMemory uses integers for the oparations, not BinaryObjects (they're deprecated now)
 ## Repository contest
-This repository have this components:
+This repository has this components:
 * Gervi core
-* Gervi core doc(in development)
+* Gervi core doc (in development)
 * GIDE (IDE for Gervi scripts)
-* gvmmake program (for creationg vitrual machine files)
+* gvmmake program (for creating vitrual machine files)
 ## License
-This project licensed under Apache 2.0 license
+This project is licensed under Apache 2.0 license

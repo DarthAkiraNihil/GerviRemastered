@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtGui
 from pathlib import Path
-import sys, pickle, os, traceback
+import sys, pickle, os, traceback, lzma
+
 CWDR = Path.cwd()
 CWD = Path.cwd() / '..'
 CWD = CWD.absolute().as_posix()
@@ -8,9 +9,10 @@ CWDR = CWDR.absolute().as_posix()
 #print(CWD)
 sys.path.append(CWDR)
 sys.path.append(CWD + '/core/GRE')
-print(sys.path)
-from main import Ui_MainWindow
+#print(sys.path)
 
+from main import Ui_MainWindow
+import g_sysvars
 
 from setup import Ui_Dialog
 from gidecfg_class import GIDEConfig
@@ -62,7 +64,7 @@ class MainForm(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
 
-        self.__ver = '0.5'
+        self.__ver = g_sysvars.GIDE_VERSION
 
         self.exit = QtWidgets.QAction('Exit', self)
         self.exit.setShortcut('Ctrl+Q')
@@ -72,7 +74,7 @@ class MainForm(QtWidgets.QMainWindow):
         self.configuration = {}
         self.wasCalled = False
         self.fname = ''
-
+        self.__currentVM = None
         self.open = QtWidgets.QAction('Open', self)
         self.open.setShortcut('Ctrl+O')
         self.open.triggered.connect(self.__open)
@@ -124,6 +126,9 @@ class MainForm(QtWidgets.QMainWindow):
             self.configFile.setOptions(sections, parameters, values)
             self.configFile.update()
             self.__extractConfig()
+    
+    def __save(self, fname):
+        pass
 
     def __run(self):
         self.fname = QtWidgets.QFileDialog.getSaveFileName(self, 'Save file', self.configuration['INTERPRETER']['progsdir'])[0]
@@ -140,8 +145,9 @@ class MainForm(QtWidgets.QMainWindow):
                     return
                 if self.configuration['INTERPRETER']['vmpath'] != '':
                     try:
-                        with open(self.configuration['INTERPRETER']['vmpath'], 'rb') as vmf:
-                            vm = pickle.load(vmf)
+                        with lzma.open(self.configuration['INTERPRETER']['vmpath'], 'rb') as vmf:
+                            vmRaw = vmf.read()
+                            vm = pickle.loads(vmRaw)
                             vm.runFile(self.fname)
                             self.ui.textBrowser_2.setText(vm.getOutputStream())
                             self.ui.textBrowser.setText(vm.getState())
@@ -151,8 +157,8 @@ class MainForm(QtWidgets.QMainWindow):
                 else:
                     pass
 print(sys.path)
+
 app = QtWidgets.QApplication([])
 application = MainForm()
 application.show()
-
 sys.exit(app.exec())

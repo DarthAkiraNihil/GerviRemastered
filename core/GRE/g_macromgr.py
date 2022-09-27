@@ -1,0 +1,2 @@
+class MacroLibraryManager:
+    pass

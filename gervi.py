@@ -1,12 +1,16 @@
-import sys, pickle
+import sys, pickle, lzma
 sys.path.append('./core/GRE')
 from g_vm import VirtualMachine
 if len(sys.argv) == 1:
     print('Usage: vmFile mode [filename]\nmode can be:\n-t - terminal mode, not require filename\n-f - file run mode, require filename')
 else:
-    vm_file = open(sys.argv[1], 'rb')
-    vm = pickle.load(vm_file)
-    vm_file.close()
+    vm = None
+    with lzma.open(sys.argv[1], 'rb') as vmf:
+        vmRaw = vmf.read()
+        vm = pickle.loads(vmRaw)
+    #vm_file = open(sys.argv[1], 'rb')
+    #vm = pickle.load(vm_file)
+    #vm_file.close()
     if sys.argv[2] == '-t':
         vm.bootUpTerminal()
     elif sys.argv[2] == '-f':

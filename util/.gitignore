@@ -9,3 +9,6 @@ in
 *.spec
 launchgide.py
 *.bat
+*.sh
+logger.py
+vmmgr.ui

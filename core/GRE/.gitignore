@@ -1,3 +1,5 @@
 __pycache__/
 dev.py
 test.gvm
+test.dump
+*deprecated*

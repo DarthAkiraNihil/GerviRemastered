@@ -1,11 +1,11 @@
 from g_pm import PrimaryMemory
-from g_bo import BinaryObject
 from g_pa import Parser
 from g_es import ExceptionSystem
+import g_sysvars
 #from g_rm import RegisterMemory
 
 class VirtualMachine:
-    def __init__(self, memorySize, name = '', shortName = '', author = '', authorEmail = '', version = ''):
+    def __init__(self, memorySize, name = '', shortName = '', author = '', authorEmail = ''):
         self.__mem = PrimaryMemory(memorySize)
         self.__size = memorySize
         self.__parser = Parser()
@@ -23,10 +23,11 @@ class VirtualMachine:
             'shortName' : shortName,
             'author' : author,
             'authorEmail' : authorEmail,
-            'version' : version,
+            'gerviVersion' : g_sysvars.GERVI_VERSION
         }
         self.__outputStream = ''
         self.__ip = 0
+        self.__last = 0
         self.__aliases = {}
 
         self.__exceptionSystem = ExceptionSystem()
@@ -55,9 +56,8 @@ class VirtualMachine:
         else:
             if p_com['com'] in self.__commandFamilies['io']:
                 if p_com['com'] == 'wrt':
-                    o_t_w = BinaryObject(8)
-                    o_t_w.write(list(map(int, list(p_com['arg2']))))
-                    self.__mem.write(int(p_com['arg1']), o_t_w)
+                    self.__mem.write(int(p_com['arg1']), int(p_com['arg2'], 2))
+                    self.__last = max(self.__last, int(p_com['arg1']))
                 elif p_com['com'] == 'rd':
                     return self.__mem.read(int(p_com['arg1']))
                 elif p_com['com'] == 'out':
@@ -113,7 +113,7 @@ class VirtualMachine:
         
         
     def bootUpTerminal(self):
-        print('[%s v. %s][by %s (%s)]' % (self.__meta['name'], self.__meta['version'], self.__meta['author'], self.__meta['authorEmail']))
+        print('[%s][by %s (%s)][Gervi version: %s]' % (self.__meta['name'], self.__meta['author'], self.__meta['authorEmail'], self.__meta['gerviVersion']))
         while True:
             command = input('%s>' % (self.__meta['shortName']))
             if command == 'shtd':
@@ -121,6 +121,7 @@ class VirtualMachine:
             else:
                 self.execute(command)
     
+    #! DEPRECATED
     def getSelf(self):
         return VirtualMachine(len(self.__mem), self.__meta['name'], self.__meta['shortName'], self.__meta['author'], self.__meta['authorEmail'], self.__meta['version'])
     
@@ -136,21 +137,48 @@ class VirtualMachine:
     def getState(self):
         meta = self.getMetaInfoString()
         state = meta + '\nCell Number |      Bin | Dec | Hex\n'
-        for i in range(self.__size):
+        for i in range(self.__last+1):
             cellVal = self.__mem.read(i)
-            if cellVal == [0,0,0,0,0,0,0,0]:
-                break
-            else:
-                formatted = ''.join(map(str, cellVal))
-                decVal = int(formatted, 2)
-                hexVal = hex(decVal)[2:]
-                state += '%11d | %8s | %3d |  %2s\n' % (i, formatted, decVal, hexVal)
-                #state += f'{i} = {formatted}\n'
+            #if cellVal == [0,0,0,0,0,0,0,0]:
+            #    break
+            #else:
+            #formatted = ''.join(map(str, cellVal))
+            decVal = int(cellVal, 2)
+            hexVal = hex(decVal)[2:]
+            state += '%11d | %8s | %3d |  %2s\n' % (i, cellVal, decVal, hexVal)
+            #state += f'{i} = {formatted}\n'
         return state
     
     def getOutputStream(self):
         return self.__outputStream
     
     def getMetaInfoString(self):
-        return 'Using %s %s by %s (memsize %d)' % (self.__meta['name'], self.__meta['version'], self.__meta['author'], self.__size)
+        return 'Using %s by %s\nGervi version %s\nMemory size: %s' % (self.__meta['name'], self.__meta['author'], self.__meta['gerviVersion'], self.__transformSize(self.__size))
+    
+    def __transformSize(self, size):
+        #bytes, KB, MB, GB
+        byteSize = self.__size
+        kBytes, mBytes, gBytes = byteSize / 1024, byteSize / (1024**2), byteSize / (1024**3)
+        if kBytes < 0.95:
+            return f'{byteSize} bytes'
+        elif kBytes >= 0.95 and mBytes < 0.95:
+            return f'{kBytes} KB ({byteSize} bytes)'
+        elif mBytes >= 0.95 and gBytes < 0.95:
+            return f'{mBytes} MB ({byteSize} bytes)'
+        else:
+            return f'{gBytes} GB ({byteSize} bytes)'
+    def exportMemory(self):
+        pass
+
+    def importMemory(self, pmiFile):
+        pass
+
+    def mountMemoryCard(self, mcFile):
+        pass
+
+    def unmountMemoryCard(self):
+        pass
+
+    def safeUnmountMemoryCard(self):
+        pass
 

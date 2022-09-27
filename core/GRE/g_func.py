@@ -1,0 +1,2 @@
+class GerviFunction:
+    pass
